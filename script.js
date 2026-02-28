@@ -4,14 +4,14 @@ window.addEventListener('load', () => {
  window.scrollTo(0, 0);
 
 const preloader = document.getElementById('preloader');
-  
+
 
    setTimeout(() => {
 preloader.style.opacity = '0';
  setTimeout(() => {
  preloader.style.visibility = 'hidden';
-}, 400); 
- }, 800); 
+}, 400);
+ }, 800);
 });
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -58,30 +58,47 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
 
-document.querySelector('form').addEventListener('submit', function(e) {
-    e.preventDefault();
+const contactForm = document.querySelector('form'); // تأكد إن ده الفورم الصح
 
+contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault(); // بنوقف التحميل التقليدي عشان نبعت بـ AJAX
+
+    const formData = new FormData(this);
     const toast = document.getElementById('custom-toast');
-    const progressBar = document.querySelector('.toast-progress');
 
-    // إظهار التوست
-    toast.classList.add('show');
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
-    // تحريك الـ Progress Bar
-    progressBar.style.transition = 'none';
-    progressBar.style.width = '100%';
-    
-    setTimeout(() => {
-        progressBar.style.transition = 'width 3s linear';
-        progressBar.style.width = '0%';
-    }, 10);
-
-    // إخفاء التوست بعد 3 ثواني
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-
-    this.reset();
+        if (response.ok) {
+            // 1. تصفير الفورم
+            this.reset();
+            
+            // 2. إظهار الرسالة الشيك (Toast)
+            toast.classList.add('show');
+            
+            // 3. إخفاء الرسالة بعد 4 ثواني
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+            
+            console.log("Success: Message sent to Formspree!");
+        } else {
+            alert("حدث خطأ ما، حاول مرة أخرى!");
+        }
+    } catch (error) {
+        alert("تأكد من اتصالك بالإنترنت!");
+    }
 });
+ function showToast() {
+     const toast = document.getElementById('custom-toast');
+    toast.classList.add('show');
+     setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
 
 });
